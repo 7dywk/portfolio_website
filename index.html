@@ -67,9 +67,10 @@ h2{font-size:clamp(2rem,5vw,3.6rem);font-weight:800;margin-bottom:28px;padding-b
 .js [data-r]{opacity:0;transform:translateY(40px);filter:blur(12px)}
 @media(prefers-reduced-motion:reduce){.js [data-r]{opacity:1;transform:none;filter:none}}
 
-.top{position:absolute;z-index:5;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:22px 0}
-.logo{font:800 1.2rem Syne,sans-serif;text-decoration:none;letter-spacing:-.02em;text-transform:uppercase}
-.top .btn{padding:9px 20px;font-size:.9rem}
+.top{position:fixed;z-index:50;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:18px 0;pointer-events:none}
+.logo{font:800 1.2rem Syne,sans-serif;text-decoration:none;letter-spacing:-.02em;text-transform:uppercase;pointer-events:auto;background:rgba(0,0,0,.45);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:6px 14px;border-radius:999px;border:1px solid var(--bd)}
+.top .btn{padding:9px 20px;font-size:.9rem;pointer-events:auto;box-shadow:0 8px 24px rgba(0,0,0,.6);opacity:0;transform:translateY(-12px);pointer-events:none;transition:opacity .35s var(--ease),transform .35s var(--ease)}
+.top.scrolled .btn{opacity:1;transform:none;pointer-events:auto}
 
 /* Hero */
 .hero{position:relative;height:100svh;min-height:620px;display:grid;grid-template-columns:minmax(0,1fr);place-items:center;text-align:center;overflow:hidden}
@@ -417,6 +418,7 @@ if (anim) {
   } catch (e) { console.warn('reveal failed', e); window.__show(); }
 } else window.__show();
 
+addEventListener('scroll', () => $('.top').classList.toggle('scrolled', scrollY > 380 && (scrollY + innerHeight) < document.body.scrollHeight - 250), { passive: true });
 h.classList.add('ok');
 } catch (e) {
   console.error('Init failed:', e);
