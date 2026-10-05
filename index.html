@@ -377,25 +377,32 @@ addEventListener('resize', fixPill);
 draw('All');
 
 const lb = $('#lb'), lbi = $('img', lb), lbc =$('figcaption', lb);
-function open(i) {
+
+function open(i, dir = 0) {
   cur = (i + shown.length) % shown.length;
   const w = shown[cur];
   lbi.src = src(w.img, w.n, 'PREVIEW ' + pad(w.n + 1)); lbi.alt = w.title;
   lbc.innerHTML = `<b>${esc(w.title)}</b><span class="mono">${esc(w.cat)}, ${esc(w.views)} views</span>`;
   if (!lb.open) { lb.showModal(); lenis && lenis.stop(); }
+  else if (anim && dir) {
+    gsap.fromTo([lbi, lbc],
+      { opacity: 0, x: dir * 36, scale: .97, filter: 'blur(8px)' },
+      { opacity: 1, x: 0, scale: 1, filter: 'blur(0px)', duration: .45, ease: 'expo.out', stagger: .03, clearProps: 'filter' }
+    );
+  }
 }
 lb.addEventListener('close', () => lenis && lenis.start());
 $('.lb-x', lb).onclick = () => lb.close();
-$('.lb-p', lb).onclick = () => open(cur - 1);$('.lb-n', lb).onclick = () => open(cur + 1);
+$('.lb-p', lb).onclick = () => open(cur - 1, -1);$('.lb-n', lb).onclick = () => open(cur + 1, 1);
 lb.onclick = e => { if (!e.target.closest('img,button')) lb.close(); };
 let tx = null;
 lb.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
 lb.addEventListener('touchend', e => {
   if (tx == null) return;
   const dx = e.changedTouches[0].clientX - tx; tx = null;
-  if (Math.abs(dx) > 50) open(cur + (dx < 0 ? 1 : -1));
+  if (Math.abs(dx) > 50) { const d = dx < 0 ? 1 : -1; open(cur + d, d); }
 }, { passive: true });
-lb.onkeydown = e => { if (e.key === 'ArrowLeft') open(cur - 1); if (e.key === 'ArrowRight') open(cur + 1); };
+lb.onkeydown = e => { if (e.key === 'ArrowLeft') open(cur - 1, -1); if (e.key === 'ArrowRight') open(cur + 1, 1); };
 
 /* ---- Contact + copy ---- */
 D.socials.forEach(s => $('#tiles').append(el('div', 'tile surf alt',
